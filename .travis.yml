@@ -33,7 +33,7 @@ before_script:
   - git clone  https://github.com/json-c/json-c
   - cd json-c
   - ./autogen.sh
-  - ./configure
+  - ./configure --prefix=/usr/
   - make
   - sudo make install
   - cd ..
