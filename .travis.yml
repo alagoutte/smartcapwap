@@ -1,0 +1,44 @@
+language: cpp
+compiler:
+  - clang
+  - gcc
+before_install:
+  - $CC --version
+  - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update -qq
+    #Install and use gcc-4.8 (don't build with gcc-4.6)
+    #libstdc++-4.8 is needed by Clang to build too
+  - sudo apt-get -qq install g++-4.8 libstdc++-4.8-dev
+  - >
+      sudo apt-get install --no-install-recommends -qq
+      automake
+      autoconf
+      libconfig-dev
+      libnl-dev
+      libtool
+      libxml2-dev
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+  - $CC --version
+before_script:
+  # Install cyassl from source
+  - git clone https://github.com/cyassl/cyassl.git
+  - cd cyassl
+  - autoreconf -i
+  - ./configure --enable-dtls --enable-psk --prefix=/usr/
+  - make
+  - sudo make install
+  - cd ..
+  # Install json-c (0.12) from source
+#  - git clone -b json-c-0.12 https://github.com/json-c/json-c
+  - git clone  https://github.com/json-c/json-c
+  - cd json-c
+  - ./autogen.sh
+  - ./configure
+  - make
+  - sudo make install
+  - cd ..
+  # Prepare building of smartcapwap... 
+  - autoreconf -i
+  - ./configure
+script:
+  - make
